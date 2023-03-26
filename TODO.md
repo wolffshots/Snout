@@ -1,0 +1,5 @@
+- [ ] time
+- [ ] DND
+- [ ] notification count
+- [ ] battery
+- [ ] solar intensity
