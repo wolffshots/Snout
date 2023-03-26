@@ -3,5 +3,5 @@
 - [ ] notification count
 - [ ] battery
 - [ ] solar intensity
-- [ ] steps
+- [x] steps
 - [x] heart rate
