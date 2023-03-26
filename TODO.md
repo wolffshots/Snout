@@ -1,5 +1,7 @@
-- [ ] time
+- [x] time
 - [ ] DND
 - [ ] notification count
 - [ ] battery
 - [ ] solar intensity
+- [ ] steps
+- [x] heart rate

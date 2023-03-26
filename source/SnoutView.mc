@@ -1,4 +1,5 @@
 import Toybox.Application;
+import Toybox.Application.Properties;
 import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.System;
@@ -7,12 +8,15 @@ import Toybox.WatchUi;
 class SnoutView extends WatchUi.WatchFace {
 
     private var sleep = false;
+    private var heartRate;
+
+    private var dateCoordinate = new Coordinate(36, 0);
+    private var dowCoordinate = new Coordinate(84, dateCoordinate.Y + 22);
+
+    private var heartRateCoordinate = new Coordinate(145, 28);
 
     private var clockCoordinate = new Coordinate(98, 38);
     private var secondsCoordinate = new Coordinate(100, 67);
-
-    private var dowCoordinate = new Coordinate(64, 8);
-    private var dateCoordinate = new Coordinate(36, 0);
 
     function initialize() {
         WatchFace.initialize();
@@ -34,17 +38,38 @@ class SnoutView extends WatchUi.WatchFace {
     function onUpdate(dc as Dc) as Void {
         // Call the parent onUpdate function to redraw the layout (just the background)
         View.onUpdate(dc);
+        var info = Activity.getActivityInfo();
+        if(info == null || info.currentHeartRate == null)
+        {
+            heartRate = "--";
+        } else {
+            heartRate = Lang.format("$1$", [info.currentHeartRate]);
+        }
 
         // Switch the drawing color to be the foreground setting
-        dc.setColor(getApp().getProperty("ForegroundColor") as Number, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(Properties.getValue("ForegroundColor") as Number, Graphics.COLOR_TRANSPARENT);
 
         var moment = Time.now();
         var currentTime = Toybox.Time.Gregorian.info(moment, Time.FORMAT_SHORT);
         dc.drawText(dateCoordinate.X, dateCoordinate.Y, Graphics.FONT_XTINY, Lang.format("$1$/$2$/$3$", [currentTime.day.format("%02d"), currentTime.month.format("%02d"), currentTime.year.format("%02d").substring(2,4)]), Graphics.TEXT_JUSTIFY_LEFT);
         
-        // divider
+        // horizontal divider belowe date
         dc.setPenWidth(1);
         dc.drawLine(16, dateCoordinate.Y + 22, 100, dateCoordinate.Y + 22);
+
+        // vertical divider before dow
+        dc.setPenWidth(1);
+        dc.drawLine(65, dateCoordinate.Y + 22, 65, clockCoordinate.Y+8);
+
+        currentTime = Toybox.Time.Gregorian.info(moment, Time.FORMAT_MEDIUM);
+        dc.drawText(dowCoordinate.X, dowCoordinate.Y, Graphics.FONT_XTINY, Lang.format("$1$", [currentTime.day_of_week]), Graphics.TEXT_JUSTIFY_CENTER);
+
+        // draw HR in circle
+        dc.drawText(heartRateCoordinate.X, heartRateCoordinate.Y, Graphics.FONT_LARGE, Lang.format("$1$", [heartRate]), Graphics.TEXT_JUSTIFY_CENTER);
+
+        // horizontal divider before clock
+        dc.setPenWidth(1);
+        dc.drawLine(2, clockCoordinate.Y+8, 102, clockCoordinate.Y+8);
 
         // Get the current time and format it correctly
         var timeFormat = "$1$:$2$";
@@ -55,7 +80,7 @@ class SnoutView extends WatchUi.WatchFace {
                 hours = hours - 12;
             }
         } else {
-            if (getApp().getProperty("UseMilitaryFormat")) {
+            if (Properties.getValue("UseMilitaryFormat")) {
                 timeFormat = "$1$$2$";
                 hours = hours.format("%02d");
             }
@@ -72,9 +97,9 @@ class SnoutView extends WatchUi.WatchFace {
             dc.drawText(secondsCoordinate.X, secondsCoordinate.Y, Graphics.FONT_SMALL, secondsTimeString, Graphics.TEXT_JUSTIFY_LEFT);
         }
 
-        // divider
+        // horizontal divider after clock
         dc.setPenWidth(1);
-        dc.drawLine(2, clockCoordinate.Y+8, 102, clockCoordinate.Y+8);
+        dc.drawLine(2, clockCoordinate.Y + 52, 174, clockCoordinate.Y + 52);
         
     }
 
