@@ -2,6 +2,9 @@
 - [ ] DND
 - [ ] notification count
 - [ ] battery
-- [ ] solar intensity
+- [x] solar intensity
 - [x] steps
 - [x] heart rate
+- [ ] add settings
+- [ ] refactor code
+- [ ] elevation/pressure

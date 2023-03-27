@@ -1,6 +1,3 @@
-import Toybox.Graphics; 
-import Toybox.Lang;
-
 class Coordinate
 {
     public var X;

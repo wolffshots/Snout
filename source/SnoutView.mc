@@ -73,7 +73,17 @@ class SnoutView extends WatchUi.WatchFace {
         }
 
         // get system stats
-        solarIntensity = System.getSystemStats().solarIntensity;
+        var systemStats = System.getSystemStats();
+        if(systemStats == null)
+        {
+            System.println("systemStats is null");
+        } else {
+            if(systemStats.solarIntensity == null){
+                solarIntensity = "n/a";
+            } else {
+                solarIntensity = systemStats.solarIntensity;
+            }
+        }
 
         // Switch the drawing color to be the foreground setting
         dc.setColor(Properties.getValue("ForegroundColor") as Number, Graphics.COLOR_TRANSPARENT);
@@ -82,7 +92,7 @@ class SnoutView extends WatchUi.WatchFace {
         var currentTime = Toybox.Time.Gregorian.info(moment, Time.FORMAT_SHORT);
         dc.drawText(dateCoordinate.X, dateCoordinate.Y, Graphics.FONT_XTINY, Lang.format("$1$/$2$/$3$", [currentTime.day.format("%02d"), currentTime.month.format("%02d"), currentTime.year.format("%02d").substring(2,4)]), Graphics.TEXT_JUSTIFY_LEFT);
         
-        // horizontal divider belowe date
+        // horizontal divider below date
         dc.setPenWidth(1);
         dc.drawLine(16, dateCoordinate.Y + 22, 100, dateCoordinate.Y + 22);
 
