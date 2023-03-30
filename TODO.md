@@ -8,3 +8,5 @@
 - [ ] add settings
 - [ ] refactor code
 - [ ] elevation/pressure
+- [ ] icons - https://github.com/garmin/connectiq-apps/tree/master/watchfaces/TypedFace/resources/drawables
+- [ ] low power mode (display it and also prevent some calc/redraws)

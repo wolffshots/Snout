@@ -8,6 +8,7 @@ import Toybox.ActivityMonitor;
 
 class SnoutView extends WatchUi.WatchFace {
 
+    // state variables
     private var sleep = false;
     private var heartRate;
     private var steps;
@@ -162,7 +163,6 @@ class SnoutView extends WatchUi.WatchFace {
         dc.setPenWidth(1);
         dc.drawLine(solarIntensityCoordinate.X-3, solarIntensityCoordinate.Y + 22, 174, solarIntensityCoordinate.Y + 22);
 
-        
     }
 
     // Called when this View is removed from the screen. Save the
