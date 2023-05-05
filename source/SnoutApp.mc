@@ -27,7 +27,7 @@ class SnoutApp extends Application.AppBase {
     
     // Return the settings menu
     function getSettingsView() as Array<Views or InputDelegates>? {
-        return [ new SnoutSettingsView(), new SnoutSettingsDelegate() ] as Array<Views or InputDelegates>;
+        return [ new SnoutSettingsMenu(), new SnoutSettingsMenuDelegate() ] as Array<Views or InputDelegates>;
     }
 
     // New app settings have been received so trigger a UI update

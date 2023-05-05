@@ -87,7 +87,7 @@ class SnoutView extends WatchUi.WatchFace {
         }
 
         // Switch the drawing color to be the foreground setting
-        dc.setColor(Properties.getValue("ForegroundColor") as Number, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(Properties.getValue("DarkMode") as Boolean ? 0xFFFFFF : 0x000000, Graphics.COLOR_TRANSPARENT);
 
         var moment = Time.now();
         var currentTime = Toybox.Time.Gregorian.info(moment, Time.FORMAT_SHORT);
