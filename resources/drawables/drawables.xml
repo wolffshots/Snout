@@ -1,3 +1,69 @@
 <drawables>
     <bitmap id="LauncherIcon" filename="launcher_icon.png" />
+
+    <bitmap 
+        id="heartDark" 
+        filename="heart.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+        </palette>    
+    </bitmap>   
+
+    <bitmap 
+        id="heartLight" 
+        filename="heart.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>000000</color>
+        </palette>    
+    </bitmap>   
+
+    <bitmap 
+        id="notificationsDark" 
+        filename="notifications.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="notificationsLight" 
+        filename="notifications.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>000000</color>
+        </palette>    
+    </bitmap>   
+
+    <bitmap 
+        id="stepsDark" 
+        filename="steps.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="stepsLight" 
+        filename="steps.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>000000</color>
+        </palette>    
+    </bitmap>   
 </drawables>

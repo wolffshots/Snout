@@ -1,12 +1,12 @@
 - [x] time
 - [ ] DND
-- [ ] notification count
+- [x] notification count
 - [ ] battery
 - [x] solar intensity
 - [x] steps
 - [x] heart rate
-- [ ] add settings
+- [x] add settings
 - [ ] refactor code
 - [ ] elevation/pressure
-- [ ] icons - https://github.com/garmin/connectiq-apps/tree/master/watchfaces/TypedFace/resources/drawables
+- [x] icons - https://github.com/garmin/connectiq-apps/tree/master/watchfaces/TypedFace/resources/drawables
 - [ ] low power mode (display it and also prevent some calc/redraws)

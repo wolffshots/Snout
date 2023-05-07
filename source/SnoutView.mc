@@ -13,25 +13,52 @@ class SnoutView extends WatchUi.WatchFace {
     private var heartRate;
     private var steps;
     private var solarIntensity;
+    private var notificationCount;
 
     private var dateCoordinate = new Coordinate(36, 0);
     private var dowCoordinate = new Coordinate(84, dateCoordinate.Y + 22);
 
-    private var heartRateCoordinate = new Coordinate(145, 28);
+    private var heartRateCoordinate = new Coordinate(146, 28);
+    private var heartRateBitmapCoordinate = new Coordinate(138, 15);
+    private var heartRateBitmap;
 
     private var clockCoordinate = new Coordinate(98, 38);
     private var secondsCoordinate = new Coordinate(100, 67);
 
-    private var stepsCoordinate = new Coordinate(128, 88);
+    private var stepsCoordinate = new Coordinate(110, 88);
+    private var stepsBitmapCoordinate = new Coordinate(stepsCoordinate.X - 20, stepsCoordinate.Y + 6);
+    private var stepsBitmap;
 
-    private var solarIntensityCoordinate = new Coordinate(144, 108);
+    private var solarIntensityCoordinate = new Coordinate(144, 31);
+
+    private var notificationCountCoordinate = new Coordinate(39, 20);
+    private var notificationCountBitmapCoordinate = new Coordinate(
+        notificationCountCoordinate.X - 25, 
+        notificationCountCoordinate.Y + 7
+    );
+    private var notificationCountBitmap;
 
     function initialize() {
         WatchFace.initialize();
+        heartRateBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.heartDark
+            : Rez.Drawables.heartLight ) as BitmapResource;
+
+        notificationCountBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.notificationsDark
+            : Rez.Drawables.notificationsLight ) as BitmapResource;
+
+        stepsBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.stepsDark
+            : Rez.Drawables.stepsLight ) as BitmapResource;
     }
 
     // Load your resources here
     function onLayout(dc as Dc) as Void {
+        System.println("onLayout");
         setLayout(Rez.Layouts.WatchFace(dc));
     }
 
@@ -40,12 +67,33 @@ class SnoutView extends WatchUi.WatchFace {
     // loading resources into memory.
     function onShow() as Void {
         System.println("Shown");
+        heartRateBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.heartDark
+            : Rez.Drawables.heartLight ) as BitmapResource;
+        notificationCountBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.notificationsDark
+            : Rez.Drawables.notificationsLight ) as BitmapResource;
+        stepsBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.stepsDark
+            : Rez.Drawables.stepsLight ) as BitmapResource;
     }
 
     // Update the view
     function onUpdate(dc as Dc) as Void {
         // Call the parent onUpdate function to redraw the layout (just the background)
         View.onUpdate(dc);
+
+        // icons
+        dc.drawBitmap(heartRateBitmapCoordinate.X, heartRateBitmapCoordinate.Y, heartRateBitmap);
+        dc.drawBitmap(
+            notificationCountBitmapCoordinate.X, 
+            notificationCountBitmapCoordinate.Y, 
+            notificationCountBitmap
+        );
+        dc.drawBitmap(stepsBitmapCoordinate.X, stepsBitmapCoordinate.Y, stepsBitmap);
 
         // activity info
         var activityInfo = Activity.getActivityInfo();
@@ -69,7 +117,16 @@ class SnoutView extends WatchUi.WatchFace {
             if(activityMonitorInfo.steps == null){
                 steps = "-";
             } else {
-                steps = Lang.format("$1$", [activityMonitorInfo.steps]);
+                var stepsThousands = activityMonitorInfo.steps / 1000;
+                if (stepsThousands > 0){
+                    var stepsRemainder = activityMonitorInfo.steps.toString().substring(
+                        activityMonitorInfo.steps.toString().length() - 3, 
+                        activityMonitorInfo.steps.toString().length()
+                    );
+                    steps = Lang.format("$1$ $2$", [stepsThousands, stepsRemainder]);
+                } else{
+                    steps = Lang.format("$1$", [activityMonitorInfo.steps]);
+                }
             }
         }
 
@@ -80,18 +137,40 @@ class SnoutView extends WatchUi.WatchFace {
             System.println("systemStats is null");
         } else {
             if(systemStats.solarIntensity == null){
-                solarIntensity = "n/a";
+                solarIntensity = 0;
             } else {
                 solarIntensity = systemStats.solarIntensity;
             }
         }
 
+        // device settings
+        var deviceSettings = System.getDeviceSettings();
+        notificationCount = deviceSettings.notificationCount;
+        
         // Switch the drawing color to be the foreground setting
-        dc.setColor(Properties.getValue("DarkMode") as Boolean ? 0xFFFFFF : 0x000000, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(
+            Properties.getValue("DarkMode") as Boolean 
+                ? 0xFFFFFF 
+                : 0x000000, 
+            Graphics.COLOR_TRANSPARENT
+        );
 
         var moment = Time.now();
         var currentTime = Toybox.Time.Gregorian.info(moment, Time.FORMAT_SHORT);
-        dc.drawText(dateCoordinate.X, dateCoordinate.Y, Graphics.FONT_XTINY, Lang.format("$1$/$2$/$3$", [currentTime.day.format("%02d"), currentTime.month.format("%02d"), currentTime.year.format("%02d").substring(2,4)]), Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(
+            dateCoordinate.X, 
+            dateCoordinate.Y, 
+            Graphics.FONT_XTINY, 
+            Lang.format(
+                "$1$/$2$/$3$", 
+                [
+                    currentTime.day.format("%02d"), 
+                    currentTime.month.format("%02d"), 
+                    currentTime.year.format("%02d").substring(2,4)
+                ]
+            ), 
+            Graphics.TEXT_JUSTIFY_LEFT
+        );
         
         // horizontal divider below date
         dc.setPenWidth(1);
@@ -102,10 +181,28 @@ class SnoutView extends WatchUi.WatchFace {
         dc.drawLine(65, dateCoordinate.Y + 22, 65, clockCoordinate.Y+8);
 
         currentTime = Toybox.Time.Gregorian.info(moment, Time.FORMAT_MEDIUM);
-        dc.drawText(dowCoordinate.X, dowCoordinate.Y, Graphics.FONT_XTINY, Lang.format("$1$", [currentTime.day_of_week]), Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(
+            dowCoordinate.X, 
+            dowCoordinate.Y, 
+            Graphics.FONT_XTINY, 
+            Lang.format(
+                "$1$", 
+                [currentTime.day_of_week]
+            ), 
+            Graphics.TEXT_JUSTIFY_CENTER
+        );
 
         // draw HR in circle
-        dc.drawText(heartRateCoordinate.X, heartRateCoordinate.Y, Graphics.FONT_LARGE, Lang.format("$1$", [heartRate]), Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(
+            heartRateCoordinate.X, 
+            heartRateCoordinate.Y, 
+            Graphics.FONT_LARGE, 
+            Lang.format(
+                "$1$", 
+                [heartRate]
+            ), 
+            Graphics.TEXT_JUSTIFY_CENTER
+        );
 
         // horizontal divider before clock
         dc.setPenWidth(1);
@@ -115,7 +212,7 @@ class SnoutView extends WatchUi.WatchFace {
         var timeFormat = "$1$:$2$";
         var clockTime = System.getClockTime();
         var hours = clockTime.hour;
-        if (!System.getDeviceSettings().is24Hour) {
+        if (!deviceSettings.is24Hour) {
             if (hours > 12) {
                 hours = hours - 12;
             }
@@ -126,15 +223,34 @@ class SnoutView extends WatchUi.WatchFace {
             }
         }
         var timeString = Lang.format(timeFormat, [hours, clockTime.min.format("%02d")]);
-        dc.drawText(clockCoordinate.X, clockCoordinate.Y, Graphics.FONT_NUMBER_THAI_HOT, timeString, Graphics.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(
+            clockCoordinate.X, 
+            clockCoordinate.Y, 
+            Graphics.FONT_NUMBER_THAI_HOT, 
+            timeString, 
+            Graphics.TEXT_JUSTIFY_RIGHT
+        );
+
         if(!sleep)
         {
             var secondsTimeString = Lang.format(":$1$", [clockTime.sec.format("%02d")]);
-            dc.drawText(secondsCoordinate.X, secondsCoordinate.Y, Graphics.FONT_SMALL, secondsTimeString, Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(
+                secondsCoordinate.X, 
+                secondsCoordinate.Y, 
+                Graphics.FONT_SMALL, 
+                secondsTimeString, 
+                Graphics.TEXT_JUSTIFY_LEFT
+            );
         }else
         {
             var secondsTimeString = "   ";
-            dc.drawText(secondsCoordinate.X, secondsCoordinate.Y, Graphics.FONT_SMALL, secondsTimeString, Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(
+                secondsCoordinate.X, 
+                secondsCoordinate.Y, 
+                Graphics.FONT_SMALL, 
+                secondsTimeString, 
+                Graphics.TEXT_JUSTIFY_LEFT
+            );
         }
 
         // horizontal divider after clock
@@ -143,26 +259,59 @@ class SnoutView extends WatchUi.WatchFace {
 
         // vertical divider before steps
         dc.setPenWidth(1);
-        dc.drawLine(stepsCoordinate.X - 3, stepsCoordinate.Y +3, stepsCoordinate.X - 3, stepsCoordinate.Y + 22);
+        dc.drawLine(
+            stepsCoordinate.X - 23, 
+            stepsCoordinate.Y + 3,  
+            stepsCoordinate.X - 23, 
+            stepsCoordinate.Y + 25
+        );
 
         var stepsString = Lang.format("$1$", [steps]);
-        dc.drawText(stepsCoordinate.X, stepsCoordinate.Y, Graphics.FONT_XTINY, stepsString, Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(
+            stepsCoordinate.X, 
+            stepsCoordinate.Y, 
+            Graphics.FONT_MEDIUM, 
+            stepsString, 
+            Graphics.TEXT_JUSTIFY_LEFT
+        );
 
         // horizontal divider after steps
         dc.setPenWidth(1);
-        dc.drawLine(stepsCoordinate.X-3, stepsCoordinate.Y + 22, 174, stepsCoordinate.Y + 22);
+        dc.drawLine(
+            stepsCoordinate.X - 23, 
+            stepsCoordinate.Y + 25, 
+            174, 
+            stepsCoordinate.Y + 25
+        );
 
-         // vertical divider before solar intensity
-        dc.setPenWidth(1);
-        dc.drawLine(solarIntensityCoordinate.X - 3, solarIntensityCoordinate.Y + 3, solarIntensityCoordinate.X - 3, solarIntensityCoordinate.Y + 22);
+        // solar intensity arc
+        if(solarIntensity != 0){
+            dc.setPenWidth(
+                solarIntensity > 0
+                    ? 3
+                    : 10
+            );
+            dc.drawArc(
+                solarIntensityCoordinate.X, 
+                solarIntensityCoordinate.Y, 
+                31, 
+                solarIntensity > 0
+                    ? Graphics.ARC_CLOCKWISE
+                    : Graphics.ARC_COUNTER_CLOCKWISE, 
+                90, 
+                ((100 - solarIntensity) * 3.6) + 90
+            );
+        }
 
-        var solarIntensityString = Lang.format("$1$", [solarIntensity]);
-        dc.drawText(solarIntensityCoordinate.X, solarIntensityCoordinate.Y, Graphics.FONT_XTINY, solarIntensityString, Graphics.TEXT_JUSTIFY_LEFT);
-
-        // horizontal divider after solar intensity
-        dc.setPenWidth(1);
-        dc.drawLine(solarIntensityCoordinate.X-3, solarIntensityCoordinate.Y + 22, 174, solarIntensityCoordinate.Y + 22);
-
+        // notification count
+        var notificationCountString = Lang.format("$1$", [notificationCount]);
+        dc.drawText(
+            notificationCountCoordinate.X, 
+            notificationCountCoordinate.Y, 
+            Graphics.FONT_MEDIUM, 
+            notificationCountString, 
+            Graphics.TEXT_JUSTIFY_LEFT
+        );
     }
 
     // Called when this View is removed from the screen. Save the
@@ -183,5 +332,4 @@ class SnoutView extends WatchUi.WatchFace {
         System.println("Entered sleep");
         sleep = true;
     }
-
 }
