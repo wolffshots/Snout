@@ -31,6 +31,17 @@ class SnoutSettingsMenu extends WatchUi.Menu2 {
                 null
             )
         );
+
+        var showSeconds = Properties.getValue("ShowSeconds") as Boolean;
+        Menu2.addItem(
+            new WatchUi.ToggleMenuItem(
+                Rez.Strings.SecondsDisplayTitle, 
+                Rez.Strings.SecondsDisplaySubtitle, 
+                "ShowSeconds", 
+                showSeconds, 
+                null
+            )
+        );
     }    
 }
 
