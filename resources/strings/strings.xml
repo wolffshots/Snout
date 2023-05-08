@@ -8,4 +8,7 @@
     <string id="MilitaryFormatTitle">Military Format</string>
     <string id="MilitaryFormatSubtitle">For 24 hour time</string>
 
+    <string id="SecondsDisplayTitle">Show Seconds</string>
+    <string id="SecondsDisplaySubtitle">Update the seconds display</string>
+
 </strings>

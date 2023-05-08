@@ -217,7 +217,7 @@ class SnoutView extends WatchUi.WatchFace {
                 hours = hours - 12;
             }
         } else {
-            if (Properties.getValue("UseMilitaryFormat")) {
+            if (Properties.getValue("UseMilitaryFormat") as Boolean) {
                 timeFormat = "$1$$2$";
                 hours = hours.format("%02d");
             }
@@ -231,7 +231,7 @@ class SnoutView extends WatchUi.WatchFace {
             Graphics.TEXT_JUSTIFY_RIGHT
         );
 
-        if(!sleep)
+        if(!sleep && Properties.getValue("ShowSeconds") as Boolean)
         {
             var secondsTimeString = Lang.format(":$1$", [clockTime.sec.format("%02d")]);
             dc.drawText(

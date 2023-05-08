@@ -8,4 +8,8 @@
         <settingConfig type="boolean" />
     </setting>
 
+    <setting propertyKey="@Properties.ShowSeconds" title="@Strings.SecondsDisplayTitle">
+        <settingConfig type="boolean" />
+    </setting>
+
 </settings>
