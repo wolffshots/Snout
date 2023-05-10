@@ -5,6 +5,7 @@ import Toybox.Lang;
 import Toybox.System;
 import Toybox.WatchUi;
 import Toybox.ActivityMonitor;
+import Toybox.Math;
 
 class SnoutView extends WatchUi.WatchFace {
 
@@ -15,6 +16,10 @@ class SnoutView extends WatchUi.WatchFace {
     private var solarIntensity;
     private var notificationCount;
     private var doNotDisturb;
+    private var battery;
+    private var batteryInDays;
+    private var batteryWidth;
+    private var charging;
 
     private var dateCoordinate = new Coordinate(36, 0);
     private var dowCoordinate = new Coordinate(84, dateCoordinate.Y + 22);
@@ -40,6 +45,17 @@ class SnoutView extends WatchUi.WatchFace {
     private var notificationCountBitmap;
     private var doNotDisturbBitmap;
 
+    private var batteryOutlineBitmapCoordinate = new Coordinate(80, 135);
+    private var batteryCoordinate = new Coordinate(
+        batteryOutlineBitmapCoordinate.X - 8, 
+        batteryOutlineBitmapCoordinate.Y - 5
+    );
+    private var batteryInDaysCoordinate = new Coordinate(
+        batteryOutlineBitmapCoordinate.X + 25, 
+        batteryOutlineBitmapCoordinate.Y - 5
+    );
+    private var batteryOutlineBitmap;
+
     function initialize() {
         WatchFace.initialize();
         heartRateBitmap = Application.loadResource( 
@@ -61,6 +77,11 @@ class SnoutView extends WatchUi.WatchFace {
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.stepsDark
             : Rez.Drawables.stepsLight ) as BitmapResource;
+
+        batteryOutlineBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.batteryOutlineDark
+            : Rez.Drawables.batteryOutlineLight ) as BitmapResource;
     }
 
     // Load your resources here
@@ -90,6 +111,10 @@ class SnoutView extends WatchUi.WatchFace {
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.stepsDark
             : Rez.Drawables.stepsLight ) as BitmapResource;
+        batteryOutlineBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.batteryOutlineDark
+            : Rez.Drawables.batteryOutlineLight ) as BitmapResource;
     }
 
     // Update the view
@@ -146,6 +171,21 @@ class SnoutView extends WatchUi.WatchFace {
             } else {
                 solarIntensity = systemStats.solarIntensity;
             }
+
+            if(systemStats.battery == null){
+                battery = 0;
+            } else {
+                battery = systemStats.battery.format("%0.1f") + "%";
+                batteryWidth = systemStats.battery/10;
+            }
+
+            if(systemStats.batteryInDays == null){
+                batteryInDays = 0;
+            } else {
+                batteryInDays = systemStats.batteryInDays.format("%d") + " days";
+            }
+            
+            charging = systemStats.charging;
         }
 
         // device settings
@@ -183,11 +223,9 @@ class SnoutView extends WatchUi.WatchFace {
         );
         
         // horizontal divider below date
-        dc.setPenWidth(1);
         dc.drawLine(16, dateCoordinate.Y + 22, 100, dateCoordinate.Y + 22);
 
         // vertical divider before dow
-        dc.setPenWidth(1);
         dc.drawLine(65, dateCoordinate.Y + 22, 65, clockCoordinate.Y+8);
 
         currentTime = Toybox.Time.Gregorian.info(moment, Time.FORMAT_MEDIUM);
@@ -215,7 +253,6 @@ class SnoutView extends WatchUi.WatchFace {
         );
 
         // horizontal divider before clock
-        dc.setPenWidth(1);
         dc.drawLine(2, clockCoordinate.Y+8, 102, clockCoordinate.Y+8);
 
         // Get the current time and format it correctly
@@ -264,11 +301,9 @@ class SnoutView extends WatchUi.WatchFace {
         }
 
         // horizontal divider after clock
-        dc.setPenWidth(1);
         dc.drawLine(2, clockCoordinate.Y + 52, 174, clockCoordinate.Y + 52);
 
         // vertical divider before steps
-        dc.setPenWidth(1);
         dc.drawLine(
             stepsCoordinate.X - 23, 
             stepsCoordinate.Y + 3,  
@@ -286,7 +321,6 @@ class SnoutView extends WatchUi.WatchFace {
         );
 
         // horizontal divider after steps
-        dc.setPenWidth(1);
         dc.drawLine(
             stepsCoordinate.X - 23, 
             stepsCoordinate.Y + 25, 
@@ -342,6 +376,42 @@ class SnoutView extends WatchUi.WatchFace {
                 Graphics.TEXT_JUSTIFY_LEFT
             );
         }
+
+        // battery display
+        dc.drawLine(
+            2, batteryOutlineBitmapCoordinate.Y - 3, 
+            178, batteryOutlineBitmapCoordinate.Y - 3
+        );
+        dc.drawLine(
+            2, batteryOutlineBitmapCoordinate.Y + 17, 
+            178, batteryOutlineBitmapCoordinate.Y + 17
+        );
+        dc.drawBitmap(
+            batteryOutlineBitmapCoordinate.X, 
+            batteryOutlineBitmapCoordinate.Y, 
+            batteryOutlineBitmap
+        );
+        dc.fillRectangle(
+            batteryOutlineBitmapCoordinate.X + 3, 
+            batteryOutlineBitmapCoordinate.Y + 6, 
+            batteryWidth, 
+            3
+        );
+
+        dc.drawText(
+            batteryCoordinate.X, 
+            batteryCoordinate.Y, 
+            Graphics.FONT_XTINY, 
+            battery, 
+            Graphics.TEXT_JUSTIFY_RIGHT
+        );
+        dc.drawText(
+            batteryInDaysCoordinate.X, 
+            batteryInDaysCoordinate.Y, 
+            Graphics.FONT_XTINY, 
+            batteryInDays, 
+            Graphics.TEXT_JUSTIFY_LEFT
+        );
     }
 
     // Called when this View is removed from the screen. Save the
