@@ -14,6 +14,7 @@ class SnoutView extends WatchUi.WatchFace {
     private var steps;
     private var solarIntensity;
     private var notificationCount;
+    private var doNotDisturb;
 
     private var dateCoordinate = new Coordinate(36, 0);
     private var dowCoordinate = new Coordinate(84, dateCoordinate.Y + 22);
@@ -37,6 +38,7 @@ class SnoutView extends WatchUi.WatchFace {
         notificationCountCoordinate.Y + 7
     );
     private var notificationCountBitmap;
+    private var doNotDisturbBitmap;
 
     function initialize() {
         WatchFace.initialize();
@@ -49,6 +51,11 @@ class SnoutView extends WatchUi.WatchFace {
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.notificationsDark
             : Rez.Drawables.notificationsLight ) as BitmapResource;
+        
+        doNotDisturbBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.doNotDisturbDark
+            : Rez.Drawables.doNotDisturbLight ) as BitmapResource;
 
         stepsBitmap = Application.loadResource( 
             Properties.getValue("DarkMode") as Boolean
@@ -75,6 +82,10 @@ class SnoutView extends WatchUi.WatchFace {
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.notificationsDark
             : Rez.Drawables.notificationsLight ) as BitmapResource;
+        doNotDisturbBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.doNotDisturbDark
+            : Rez.Drawables.doNotDisturbLight ) as BitmapResource;
         stepsBitmap = Application.loadResource( 
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.stepsDark
@@ -86,13 +97,7 @@ class SnoutView extends WatchUi.WatchFace {
         // Call the parent onUpdate function to redraw the layout (just the background)
         View.onUpdate(dc);
 
-        // icons
         dc.drawBitmap(heartRateBitmapCoordinate.X, heartRateBitmapCoordinate.Y, heartRateBitmap);
-        dc.drawBitmap(
-            notificationCountBitmapCoordinate.X, 
-            notificationCountBitmapCoordinate.Y, 
-            notificationCountBitmap
-        );
         dc.drawBitmap(stepsBitmapCoordinate.X, stepsBitmapCoordinate.Y, stepsBitmap);
 
         // activity info
@@ -145,7 +150,12 @@ class SnoutView extends WatchUi.WatchFace {
 
         // device settings
         var deviceSettings = System.getDeviceSettings();
-        notificationCount = deviceSettings.notificationCount;
+        if (deviceSettings has :doNotDisturb) {
+            doNotDisturb = deviceSettings.doNotDisturb;
+        }
+        if (deviceSettings has :notificationCount && !doNotDisturb) {
+            notificationCount = deviceSettings.notificationCount;
+        }
         
         // Switch the drawing color to be the foreground setting
         dc.setColor(
@@ -303,15 +313,35 @@ class SnoutView extends WatchUi.WatchFace {
             );
         }
 
-        // notification count
-        var notificationCountString = Lang.format("$1$", [notificationCount]);
-        dc.drawText(
-            notificationCountCoordinate.X, 
-            notificationCountCoordinate.Y, 
-            Graphics.FONT_MEDIUM, 
-            notificationCountString, 
-            Graphics.TEXT_JUSTIFY_LEFT
-        );
+        // notification count and do not disturb
+        if(doNotDisturb){
+            dc.drawBitmap(
+                notificationCountBitmapCoordinate.X, 
+                notificationCountBitmapCoordinate.Y, 
+                doNotDisturbBitmap
+            );
+            dc.drawText(
+                notificationCountCoordinate.X, 
+                notificationCountCoordinate.Y, 
+                Graphics.FONT_MEDIUM, 
+                "--", 
+                Graphics.TEXT_JUSTIFY_LEFT
+            );
+        } else {
+            var notificationCountString = Lang.format("$1$", [notificationCount]);
+            dc.drawBitmap(
+                notificationCountBitmapCoordinate.X, 
+                notificationCountBitmapCoordinate.Y, 
+                notificationCountBitmap
+            );
+            dc.drawText(
+                notificationCountCoordinate.X, 
+                notificationCountCoordinate.Y, 
+                Graphics.FONT_MEDIUM, 
+                notificationCountString, 
+                Graphics.TEXT_JUSTIFY_LEFT
+            );
+        }
     }
 
     // Called when this View is removed from the screen. Save the

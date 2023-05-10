@@ -66,4 +66,26 @@
             <color>000000</color>
         </palette>    
     </bitmap>   
+
+    <bitmap 
+        id="doNotDisturbDark" 
+        filename="dnd.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="doNotDisturbLight" 
+        filename="dnd.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>000000</color>
+        </palette>    
+    </bitmap>  
 </drawables>
