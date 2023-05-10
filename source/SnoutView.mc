@@ -19,7 +19,7 @@ class SnoutView extends WatchUi.WatchFace {
     private var battery;
     private var batteryInDays;
     private var batteryWidth;
-    private var charging;
+    // private var charging;
 
     private var dateCoordinate = new Coordinate(36, 0);
     private var dowCoordinate = new Coordinate(84, dateCoordinate.Y + 22);
@@ -185,15 +185,13 @@ class SnoutView extends WatchUi.WatchFace {
                 batteryInDays = systemStats.batteryInDays.format("%d") + " days";
             }
             
-            charging = systemStats.charging;
+            // charging = systemStats.charging;
         }
 
         // device settings
         var deviceSettings = System.getDeviceSettings();
-        if (deviceSettings has :doNotDisturb) {
-            doNotDisturb = deviceSettings.doNotDisturb;
-        }
-        if (deviceSettings has :notificationCount && !doNotDisturb) {
+        doNotDisturb = deviceSettings.doNotDisturb;
+        if (deviceSettings.notificationCount != null && !doNotDisturb) {
             notificationCount = deviceSettings.notificationCount;
         }
         
