@@ -112,6 +112,50 @@
     </bitmap>  
 
     <bitmap 
+        id="pressureDark" 
+        filename="gauge.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="pressureLight" 
+        filename="gauge.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>000000</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="altitudeDark" 
+        filename="mountain.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="altitudeLight" 
+        filename="mountain.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>000000</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
         id="boltDark" 
         filename="bolt.svg" 
         scaleX="3%"
