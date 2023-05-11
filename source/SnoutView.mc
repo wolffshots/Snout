@@ -20,6 +20,8 @@ class SnoutView extends WatchUi.WatchFace {
     private var batteryInDays;
     private var batteryWidth;
     // private var charging;
+    private var pressure;
+    private var altitude;
 
     private var dateCoordinate = new Coordinate(36, 0);
     private var dowCoordinate = new Coordinate(84, dateCoordinate.Y + 22);
@@ -31,7 +33,7 @@ class SnoutView extends WatchUi.WatchFace {
     private var clockCoordinate = new Coordinate(98, 38);
     private var secondsCoordinate = new Coordinate(100, 67);
 
-    private var stepsCoordinate = new Coordinate(110, 88);
+    private var stepsCoordinate = new Coordinate(111, 88);
     private var stepsBitmapCoordinate = new Coordinate(stepsCoordinate.X - 20, stepsCoordinate.Y + 6);
     private var stepsBitmap;
 
@@ -55,6 +57,20 @@ class SnoutView extends WatchUi.WatchFace {
         batteryOutlineBitmapCoordinate.Y - 5
     );
     private var batteryOutlineBitmap;
+
+    private var pressureCoordinate = new Coordinate(25, 110);
+    private var pressureBitmapCoordinate = new Coordinate(
+        pressureCoordinate.X - 20, 
+        pressureCoordinate.Y + 6
+    );
+    private var pressureBitmap;
+
+    private var altitudeCoordinate = new Coordinate(111, 110);
+    private var altitudeBitmapCoordinate = new Coordinate(
+        altitudeCoordinate.X - 20, 
+        altitudeCoordinate.Y + 6
+    );
+    private var altitudeBitmap;
 
     function initialize() {
         WatchFace.initialize();
@@ -81,6 +97,16 @@ class SnoutView extends WatchUi.WatchFace {
         batteryOutlineBitmap = Application.loadResource( 
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.batteryOutlineDark
+            : Rez.Drawables.batteryOutlineLight ) as BitmapResource;
+
+        pressureBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.pressureDark
+            : Rez.Drawables.pressureLight ) as BitmapResource;
+
+        altitudeBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.altitudeDark
             : Rez.Drawables.batteryOutlineLight ) as BitmapResource;
     }
 
@@ -115,6 +141,14 @@ class SnoutView extends WatchUi.WatchFace {
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.batteryOutlineDark
             : Rez.Drawables.batteryOutlineLight ) as BitmapResource;
+        pressureBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.pressureDark
+            : Rez.Drawables.pressureLight ) as BitmapResource;
+        altitudeBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.altitudeDark
+            : Rez.Drawables.batteryOutlineLight ) as BitmapResource;
     }
 
     // Update the view
@@ -135,6 +169,20 @@ class SnoutView extends WatchUi.WatchFace {
                 heartRate = "--";
             } else {
                 heartRate = Lang.format("$1$", [activityInfo.currentHeartRate]);
+            }
+            if(activityInfo.ambientPressure == null){
+                pressure = "--";
+            } else {
+                pressure = (activityInfo.ambientPressure/1000).format("%0.1f") + "kPa";
+            }
+            if(activityInfo.altitude == null){
+                altitude = "--";
+            } else {
+                if(activityInfo.altitude > 10000){
+                    altitude = (activityInfo.altitude/1000).format("%0.2f") + "km";
+                }else{
+                    altitude = activityInfo.altitude.format("%0.1f") + "m";
+                }
             }
         }
 
@@ -320,7 +368,7 @@ class SnoutView extends WatchUi.WatchFace {
 
         // horizontal divider after steps
         dc.drawLine(
-            stepsCoordinate.X - 23, 
+            2, 
             stepsCoordinate.Y + 25, 
             174, 
             stepsCoordinate.Y + 25
@@ -379,11 +427,11 @@ class SnoutView extends WatchUi.WatchFace {
         // battery display
         dc.drawLine(
             2, batteryOutlineBitmapCoordinate.Y - 3, 
-            178, batteryOutlineBitmapCoordinate.Y - 3
+            174, batteryOutlineBitmapCoordinate.Y - 3
         );
         dc.drawLine(
-            2, batteryOutlineBitmapCoordinate.Y + 17, 
-            178, batteryOutlineBitmapCoordinate.Y + 17
+            16, batteryOutlineBitmapCoordinate.Y + 17, 
+            160, batteryOutlineBitmapCoordinate.Y + 17
         );
         dc.drawBitmap(
             batteryOutlineBitmapCoordinate.X, 
@@ -409,6 +457,34 @@ class SnoutView extends WatchUi.WatchFace {
             batteryInDaysCoordinate.Y, 
             Graphics.FONT_XTINY, 
             batteryInDays, 
+            Graphics.TEXT_JUSTIFY_LEFT
+        );
+
+        dc.drawBitmap(
+            pressureBitmapCoordinate.X, 
+            pressureBitmapCoordinate.Y, 
+            pressureBitmap
+        );
+        dc.drawText(
+            pressureCoordinate.X, 
+            pressureCoordinate.Y, 
+            Graphics.FONT_XTINY, 
+            pressure, 
+            Graphics.TEXT_JUSTIFY_LEFT
+        );
+
+        dc.drawLine(88, 114, 88, 133);
+
+        dc.drawBitmap(
+            altitudeBitmapCoordinate.X, 
+            altitudeBitmapCoordinate.Y, 
+            altitudeBitmap
+        );
+        dc.drawText(
+            altitudeCoordinate.X, 
+            altitudeCoordinate.Y, 
+            Graphics.FONT_XTINY, 
+            altitude, 
             Graphics.TEXT_JUSTIFY_LEFT
         );
     }
