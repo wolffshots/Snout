@@ -330,7 +330,7 @@ class SnoutView extends WatchUi.WatchFace {
         if(solarIntensity != 0){
             dc.setPenWidth(
                 solarIntensity > 0
-                    ? 3
+                    ? 5
                     : 10
             );
             dc.drawArc(
@@ -344,6 +344,7 @@ class SnoutView extends WatchUi.WatchFace {
                 ((100 - solarIntensity) * 3.6) + 90
             );
         }
+        dc.setPenWidth(1);
 
         // notification count and do not disturb
         if(doNotDisturb){
