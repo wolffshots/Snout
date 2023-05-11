@@ -59,17 +59,17 @@ class SnoutView extends WatchUi.WatchFace {
     private var batteryOutlineBitmap;
     private var boltBitmap;
 
-    private var pressureCoordinate = new Coordinate(25, 110);
+    private var pressureCoordinate = new Coordinate(18, 111);
     private var pressureBitmapCoordinate = new Coordinate(
-        pressureCoordinate.X - 20, 
-        pressureCoordinate.Y + 6
+        pressureCoordinate.X - 16, 
+        pressureCoordinate.Y + 5
     );
     private var pressureBitmap;
 
-    private var altitudeCoordinate = new Coordinate(111, 110);
+    private var altitudeCoordinate = new Coordinate(108, 111);
     private var altitudeBitmapCoordinate = new Coordinate(
-        altitudeCoordinate.X - 20, 
-        altitudeCoordinate.Y + 6
+        altitudeCoordinate.X - 17, 
+        altitudeCoordinate.Y + 5
     );
     private var altitudeBitmap;
 
@@ -183,12 +183,16 @@ class SnoutView extends WatchUi.WatchFace {
             if(activityInfo.ambientPressure == null){
                 pressure = "--";
             } else {
-                pressure = (activityInfo.ambientPressure/1000).format("%0.1f") + "kPa";
+                if(activityInfo.ambientPressure >= 1000){
+                    pressure = (activityInfo.ambientPressure/1000).format("%0.1f") + "kPa";
+                } else{
+                    pressure = (activityInfo.ambientPressure).format("%0.2f") + "Pa";
+                }
             }
             if(activityInfo.altitude == null){
                 altitude = "--";
             } else {
-                if(activityInfo.altitude > 10000){
+                if(activityInfo.altitude >= 10000){
                     altitude = (activityInfo.altitude/1000).format("%0.2f") + "km";
                 }else{
                     altitude = activityInfo.altitude.format("%0.1f") + "m";
