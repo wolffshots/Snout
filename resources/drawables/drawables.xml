@@ -154,4 +154,26 @@
             <color>000000</color>
         </palette>    
     </bitmap>  
+
+    <bitmap 
+        id="boltDark" 
+        filename="bolt.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="boltLight" 
+        filename="bolt.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>000000</color>
+        </palette>    
+    </bitmap>  
 </drawables>

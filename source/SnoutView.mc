@@ -19,7 +19,7 @@ class SnoutView extends WatchUi.WatchFace {
     private var battery;
     private var batteryInDays;
     private var batteryWidth;
-    // private var charging;
+    private var charging;
     private var pressure;
     private var altitude;
 
@@ -57,6 +57,7 @@ class SnoutView extends WatchUi.WatchFace {
         batteryOutlineBitmapCoordinate.Y - 5
     );
     private var batteryOutlineBitmap;
+    private var boltBitmap;
 
     private var pressureCoordinate = new Coordinate(25, 110);
     private var pressureBitmapCoordinate = new Coordinate(
@@ -98,6 +99,11 @@ class SnoutView extends WatchUi.WatchFace {
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.batteryOutlineDark
             : Rez.Drawables.batteryOutlineLight ) as BitmapResource;
+
+        boltBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.boltDark
+            : Rez.Drawables.boltLight ) as BitmapResource;
 
         pressureBitmap = Application.loadResource( 
             Properties.getValue("DarkMode") as Boolean
@@ -141,6 +147,10 @@ class SnoutView extends WatchUi.WatchFace {
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.batteryOutlineDark
             : Rez.Drawables.batteryOutlineLight ) as BitmapResource;
+        boltBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.boltDark
+            : Rez.Drawables.boltLight ) as BitmapResource;
         pressureBitmap = Application.loadResource( 
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.pressureDark
@@ -233,7 +243,7 @@ class SnoutView extends WatchUi.WatchFace {
                 batteryInDays = systemStats.batteryInDays.format("%d") + " days";
             }
             
-            // charging = systemStats.charging;
+            charging = systemStats.charging;
         }
 
         // device settings
@@ -438,12 +448,41 @@ class SnoutView extends WatchUi.WatchFace {
             batteryOutlineBitmapCoordinate.Y, 
             batteryOutlineBitmap
         );
-        dc.fillRectangle(
-            batteryOutlineBitmapCoordinate.X + 3, 
-            batteryOutlineBitmapCoordinate.Y + 6, 
-            batteryWidth, 
-            3
-        );
+        if(charging){
+            dc.setColor(
+                Properties.getValue("DarkMode") as Boolean 
+                    ? 0x000000
+                    : 0xFFFFFF, 
+                 Properties.getValue("DarkMode") as Boolean 
+                    ? 0xFFFFFF 
+                    : 0x000000
+            );
+            dc.fillRectangle(
+                batteryOutlineBitmapCoordinate.X + 4, 
+                batteryOutlineBitmapCoordinate.Y + 2, 
+                8, 
+                11
+            );
+            dc.setColor(
+                Properties.getValue("DarkMode") as Boolean 
+                    ? 0xFFFFFF 
+                    : 0x000000, 
+                Graphics.COLOR_TRANSPARENT
+            );
+            dc.drawBitmap(
+                batteryOutlineBitmapCoordinate.X + 1, 
+                batteryOutlineBitmapCoordinate.Y, 
+                boltBitmap
+            );
+        }else{
+            dc.fillRectangle(
+                batteryOutlineBitmapCoordinate.X + 3, 
+                batteryOutlineBitmapCoordinate.Y + 6, 
+                batteryWidth, 
+                3
+            );
+        }
+
 
         dc.drawText(
             batteryCoordinate.X, 
