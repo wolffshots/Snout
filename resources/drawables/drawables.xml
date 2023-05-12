@@ -176,4 +176,224 @@
             <color>000000</color>
         </palette>    
     </bitmap>  
+
+    <bitmap 
+        id="cloudDark" 
+        filename="cloud.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="cloudLight" 
+        filename="cloud.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>000000</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="downDark" 
+        filename="down.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="downLight" 
+        filename="down.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>000000</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="upDark" 
+        filename="up.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="upLight" 
+        filename="up.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>000000</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="unknownDark" 
+        filename="unknown.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="unknownLight" 
+        filename="unknown.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>000000</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="sunDark" 
+        filename="sun.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="sunLight" 
+        filename="sun.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>000000</color>
+        </palette>    
+    </bitmap> 
+
+    <bitmap 
+        id="stormDark" 
+        filename="storm.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="stormLight" 
+        filename="storm.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>000000</color>
+        </palette>    
+    </bitmap>   
+
+    <bitmap 
+        id="rainDark" 
+        filename="rain.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="rainLight" 
+        filename="rain.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>000000</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="partlyCloudyDark" 
+        filename="partly-cloudy.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="partlyCloudyLight" 
+        filename="partly-cloudy.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>000000</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="temperatureDark" 
+        filename="temperature.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="temperatureLight" 
+        filename="temperature.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>000000</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="humidityDark" 
+        filename="humidity.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>FFFFFF</color>
+        </palette>    
+    </bitmap>  
+
+    <bitmap 
+        id="humidityLight" 
+        filename="humidity.svg" 
+        scaleX="3%"
+        scaleY="3%"
+    >     
+        <palette disableTransparency="false">
+            <color>000000</color>
+        </palette>    
+    </bitmap>  
 </drawables>

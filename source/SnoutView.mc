@@ -6,6 +6,7 @@ import Toybox.System;
 import Toybox.WatchUi;
 import Toybox.ActivityMonitor;
 import Toybox.Math;
+import Toybox.Weather;
 
 class SnoutView extends WatchUi.WatchFace {
 
@@ -22,6 +23,10 @@ class SnoutView extends WatchUi.WatchFace {
     private var charging;
     private var pressure;
     private var altitude;
+    private var weatherLow;
+    private var weatherHigh;
+    private var temperature;
+    private var humidity;
 
     private var dateCoordinate = new Coordinate(36, 0);
     private var dowCoordinate = new Coordinate(84, dateCoordinate.Y + 22);
@@ -54,7 +59,7 @@ class SnoutView extends WatchUi.WatchFace {
     );
     private var batteryInDaysCoordinate = new Coordinate(
         batteryOutlineBitmapCoordinate.X + 25, 
-        batteryOutlineBitmapCoordinate.Y - 5
+        batteryOutlineBitmapCoordinate.Y - 6
     );
     private var batteryOutlineBitmap;
     private var boltBitmap;
@@ -73,47 +78,125 @@ class SnoutView extends WatchUi.WatchFace {
     );
     private var altitudeBitmap;
 
-    function initialize() {
-        WatchFace.initialize();
+    private var downBitmap;
+    private var weatherLowCoordinate = new Coordinate(38, 149);
+    private var downBitmapCoordinate = new Coordinate(
+        weatherLowCoordinate.X - 12, 
+        weatherLowCoordinate.Y + 2
+    );
+
+    private var conditionBitmap;
+    private var conditionBitmapCoordinate = new Coordinate(81, 155);
+    private var unknownBitmap;
+    private var sunBitmap;
+    private var cloudBitmap;
+    private var rainBitmap;
+    private var stormBitmap;
+    private var partlyCloudyBitmap;
+
+    private var upBitmap;
+    private var weatherHighCoordinate = new Coordinate(136, 149);
+    private var upBitmapCoordinate = new Coordinate(
+        weatherHighCoordinate.X + 2, 
+        weatherHighCoordinate.Y + 5
+    );
+
+    private var temperatureBitmap;
+    private var temperatureCoordinate = new Coordinate(10, 89);
+    private var temperatureBitmapCoordinate = new Coordinate(
+        temperatureCoordinate.X - 9, 
+        temperatureCoordinate.Y + 6
+    );
+
+    private var humidityBitmap;
+    private var humidityCoordinate = new Coordinate(
+        temperatureCoordinate.X + 44, 
+        temperatureCoordinate.Y
+    );
+    private var humidityBitmapCoordinate = new Coordinate(
+        humidityCoordinate.X - 12, 
+        humidityCoordinate.Y + 6
+    );
+
+
+    function loadResources() {
         heartRateBitmap = Application.loadResource( 
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.heartDark
             : Rez.Drawables.heartLight ) as BitmapResource;
-
         notificationCountBitmap = Application.loadResource( 
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.notificationsDark
             : Rez.Drawables.notificationsLight ) as BitmapResource;
-        
         doNotDisturbBitmap = Application.loadResource( 
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.doNotDisturbDark
             : Rez.Drawables.doNotDisturbLight ) as BitmapResource;
-
         stepsBitmap = Application.loadResource( 
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.stepsDark
             : Rez.Drawables.stepsLight ) as BitmapResource;
-
         batteryOutlineBitmap = Application.loadResource( 
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.batteryOutlineDark
             : Rez.Drawables.batteryOutlineLight ) as BitmapResource;
-
         boltBitmap = Application.loadResource( 
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.boltDark
             : Rez.Drawables.boltLight ) as BitmapResource;
-
         pressureBitmap = Application.loadResource( 
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.pressureDark
             : Rez.Drawables.pressureLight ) as BitmapResource;
-
         altitudeBitmap = Application.loadResource( 
             Properties.getValue("DarkMode") as Boolean
             ? Rez.Drawables.altitudeDark
-            : Rez.Drawables.batteryOutlineLight ) as BitmapResource;
+            : Rez.Drawables.altitudeLight ) as BitmapResource;
+        upBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.upDark
+            : Rez.Drawables.upLight ) as BitmapResource;
+        downBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.downDark
+            : Rez.Drawables.downLight ) as BitmapResource;
+        unknownBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.unknownDark
+            : Rez.Drawables.unknownLight ) as BitmapResource;
+        sunBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.sunDark
+            : Rez.Drawables.sunLight ) as BitmapResource;
+        cloudBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.cloudDark
+            : Rez.Drawables.cloudLight ) as BitmapResource;
+        rainBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.rainDark
+            : Rez.Drawables.rainLight ) as BitmapResource;
+        stormBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.stormDark
+            : Rez.Drawables.stormLight ) as BitmapResource;
+        partlyCloudyBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.partlyCloudyDark
+            : Rez.Drawables.partlyCloudyLight ) as BitmapResource;
+        temperatureBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.temperatureDark
+            : Rez.Drawables.temperatureLight ) as BitmapResource;
+        humidityBitmap = Application.loadResource( 
+            Properties.getValue("DarkMode") as Boolean
+            ? Rez.Drawables.humidityDark
+            : Rez.Drawables.humidityLight ) as BitmapResource;
+    }
+
+    function initialize() {
+        WatchFace.initialize();
+        loadResources();
     }
 
     // Load your resources here
@@ -127,38 +210,7 @@ class SnoutView extends WatchUi.WatchFace {
     // loading resources into memory.
     function onShow() as Void {
         System.println("Shown");
-        heartRateBitmap = Application.loadResource( 
-            Properties.getValue("DarkMode") as Boolean
-            ? Rez.Drawables.heartDark
-            : Rez.Drawables.heartLight ) as BitmapResource;
-        notificationCountBitmap = Application.loadResource( 
-            Properties.getValue("DarkMode") as Boolean
-            ? Rez.Drawables.notificationsDark
-            : Rez.Drawables.notificationsLight ) as BitmapResource;
-        doNotDisturbBitmap = Application.loadResource( 
-            Properties.getValue("DarkMode") as Boolean
-            ? Rez.Drawables.doNotDisturbDark
-            : Rez.Drawables.doNotDisturbLight ) as BitmapResource;
-        stepsBitmap = Application.loadResource( 
-            Properties.getValue("DarkMode") as Boolean
-            ? Rez.Drawables.stepsDark
-            : Rez.Drawables.stepsLight ) as BitmapResource;
-        batteryOutlineBitmap = Application.loadResource( 
-            Properties.getValue("DarkMode") as Boolean
-            ? Rez.Drawables.batteryOutlineDark
-            : Rez.Drawables.batteryOutlineLight ) as BitmapResource;
-        boltBitmap = Application.loadResource( 
-            Properties.getValue("DarkMode") as Boolean
-            ? Rez.Drawables.boltDark
-            : Rez.Drawables.boltLight ) as BitmapResource;
-        pressureBitmap = Application.loadResource( 
-            Properties.getValue("DarkMode") as Boolean
-            ? Rez.Drawables.pressureDark
-            : Rez.Drawables.pressureLight ) as BitmapResource;
-        altitudeBitmap = Application.loadResource( 
-            Properties.getValue("DarkMode") as Boolean
-            ? Rez.Drawables.altitudeDark
-            : Rez.Drawables.batteryOutlineLight ) as BitmapResource;
+        loadResources();
     }
 
     // Update the view
@@ -219,7 +271,7 @@ class SnoutView extends WatchUi.WatchFace {
                 } else{
                     steps = Lang.format("$1$", [activityMonitorInfo.steps]);
                 }
-            }
+            }            
         }
 
         // get system stats
@@ -255,6 +307,63 @@ class SnoutView extends WatchUi.WatchFace {
         doNotDisturb = deviceSettings.doNotDisturb;
         if (deviceSettings.notificationCount != null && !doNotDisturb) {
             notificationCount = deviceSettings.notificationCount;
+        }
+
+        // weather
+        var currentConditions = Weather.getCurrentConditions();
+        if (currentConditions != null){
+            switch (currentConditions.condition){
+                case Weather.CONDITION_CLEAR:
+                case Weather.CONDITION_MOSTLY_CLEAR:
+                case Weather.CONDITION_FAIR:
+                case Weather.CONDITION_PARTLY_CLEAR:
+                    conditionBitmap = sunBitmap;
+                    break;
+                case Weather.CONDITION_CLOUDY:
+                    conditionBitmap = cloudBitmap;
+                    break;
+                case Weather.CONDITION_MOSTLY_CLOUDY:
+                case Weather.CONDITION_PARTLY_CLOUDY:
+                    conditionBitmap = partlyCloudyBitmap;
+                    break;
+                case Weather.CONDITION_RAIN:
+                case Weather.CONDITION_CLOUDY_CHANCE_OF_RAIN:
+                case Weather.CONDITION_HEAVY_RAIN:
+                case Weather.CONDITION_LIGHT_RAIN:
+                case Weather.CONDITION_HEAVY_SHOWERS:
+                case Weather.CONDITION_LIGHT_SHOWERS:
+                case Weather.CONDITION_SHOWERS:
+                    conditionBitmap = rainBitmap;
+                    break;
+                case Weather.CONDITION_THUNDERSTORMS:
+                case Weather.CONDITION_TROPICAL_STORM:
+                case Weather.CONDITION_SCATTERED_THUNDERSTORMS:
+                case Weather.CONDITION_CHANCE_OF_THUNDERSTORMS:
+                    conditionBitmap = stormBitmap;
+                    break;
+                default:
+                    conditionBitmap = unknownBitmap;
+                    break;
+            }
+        }else{
+            conditionBitmap = unknownBitmap;
+        }
+        if(currentConditions != null && 
+            currentConditions.lowTemperature != null && 
+            currentConditions.highTemperature != null && 
+            currentConditions.temperature != null && 
+            currentConditions.relativeHumidity != null
+        ){
+            weatherLow = currentConditions.lowTemperature + "°";
+            weatherHigh = currentConditions.highTemperature + "°";
+            temperature = currentConditions.temperature + "°";
+            humidity = currentConditions.relativeHumidity + 
+                (currentConditions.relativeHumidity < 100 ? "%": "");
+        }else {
+            weatherLow =  "--";
+            weatherHigh = "--";
+            temperature = "--";
+            humidity = "--";
         }
         
         // Switch the drawing color to be the foreground setting
@@ -528,6 +637,66 @@ class SnoutView extends WatchUi.WatchFace {
             altitudeCoordinate.Y, 
             Graphics.FONT_XTINY, 
             altitude, 
+            Graphics.TEXT_JUSTIFY_LEFT
+        );
+
+        dc.drawBitmap(
+            downBitmapCoordinate.X, 
+            downBitmapCoordinate.Y, 
+            downBitmap
+        );
+        dc.drawText(
+            weatherLowCoordinate.X, 
+            weatherLowCoordinate.Y, 
+            Graphics.FONT_XTINY, 
+            weatherLow, 
+            Graphics.TEXT_JUSTIFY_LEFT
+        );
+
+        dc.drawBitmap(
+            conditionBitmapCoordinate.X, 
+            conditionBitmapCoordinate.Y, 
+            conditionBitmap
+        );
+
+        dc.drawBitmap(
+            upBitmapCoordinate.X, 
+            upBitmapCoordinate.Y, 
+            upBitmap
+        );
+        dc.drawText(
+            weatherHighCoordinate.X, 
+            weatherHighCoordinate.Y, 
+            Graphics.FONT_XTINY, 
+            weatherHigh, 
+            Graphics.TEXT_JUSTIFY_RIGHT
+        );
+
+        dc.drawBitmap(
+            temperatureBitmapCoordinate.X, 
+            temperatureBitmapCoordinate.Y, 
+            temperatureBitmap
+        );
+
+        dc.drawText(
+            temperatureCoordinate.X, 
+            temperatureCoordinate.Y, 
+            Graphics.FONT_XTINY, 
+            temperature, 
+            Graphics.TEXT_JUSTIFY_LEFT
+        );
+
+        dc.drawBitmap(
+            humidityBitmapCoordinate.X, 
+            humidityBitmapCoordinate.Y, 
+            humidityBitmap
+        );
+
+        dc.drawText(
+            humidityCoordinate.X, 
+            humidityCoordinate.Y, 
+            Graphics.FONT_XTINY, 
+            humidity, 
             Graphics.TEXT_JUSTIFY_LEFT
         );
     }
