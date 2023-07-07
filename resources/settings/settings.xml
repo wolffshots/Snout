@@ -12,4 +12,16 @@
         <settingConfig type="boolean" />
     </setting>
 
+    <setting propertyKey="@Properties.UseFarenheit" title="@Strings.UseFarenheitTitle">
+        <settingConfig type="boolean" />
+    </setting>
+
+    <setting propertyKey="@Properties.ShowLines" title="@Strings.ShowLinesTitle">
+        <settingConfig type="boolean" />
+    </setting>
+
+    <setting propertyKey="@Properties.ShowEnvironment" title="@Strings.ShowEnvironmentTitle">
+        <settingConfig type="boolean" />
+    </setting>
+
 </settings>

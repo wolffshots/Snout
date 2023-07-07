@@ -118,6 +118,15 @@ class SnoutView extends WatchUi.WatchFace {
         humidityCoordinate.Y + 6
     );
 
+    function getFormattedTemp(temp as Number) as Number {
+        if (Properties.getValue("UseFarenheit") as Boolean){
+            return (temp * (9/5)) + 32;
+        }
+        else{
+            return temp;
+        }
+    }
+
 
     function loadResources() {
         heartRateBitmap = Application.loadResource( 
@@ -198,11 +207,107 @@ class SnoutView extends WatchUi.WatchFace {
         WatchFace.initialize();
         loadResources();
     }
+    function drawLines(dc) {
+        if (Properties.getValue("ShowLines") as Boolean){
+            // horizontal divider below date
+            dc.drawLine(16, dateCoordinate.Y + 22, 100, dateCoordinate.Y + 22);
+
+            // vertical divider before dow
+            dc.drawLine(65, dateCoordinate.Y + 22, 65, clockCoordinate.Y+8);
+
+            // horizontal divider before clock
+            dc.drawLine(2, clockCoordinate.Y+8, 102, clockCoordinate.Y+8);
+
+            // horizontal divider after clock
+            dc.drawLine(2, clockCoordinate.Y + 52, 174, clockCoordinate.Y + 52);
+
+            // vertical divider before steps
+            dc.drawLine(
+                stepsCoordinate.X - 23, 
+                stepsCoordinate.Y + 3,  
+                stepsCoordinate.X - 23, 
+                stepsCoordinate.Y + 25
+            );
+
+            // horizontal divider after steps
+            dc.drawLine(
+                2, 
+                stepsCoordinate.Y + 25, 
+                174, 
+                stepsCoordinate.Y + 25
+            );
+
+            // battery display
+            dc.drawLine(
+                2, batteryOutlineBitmapCoordinate.Y - 3, 
+                174, batteryOutlineBitmapCoordinate.Y - 3
+            );
+            dc.drawLine(
+                16, batteryOutlineBitmapCoordinate.Y + 17, 
+                160, batteryOutlineBitmapCoordinate.Y + 17
+            );
+
+            // line between pressure and altitude
+            dc.drawLine(88, 114, 88, 133);
+        }
+    }
+
+    function drawBitmaps(dc) {
+        dc.drawBitmap(heartRateBitmapCoordinate.X, heartRateBitmapCoordinate.Y, heartRateBitmap);
+        dc.drawBitmap(stepsBitmapCoordinate.X, stepsBitmapCoordinate.Y, stepsBitmap);
+        dc.drawBitmap(
+            batteryOutlineBitmapCoordinate.X, 
+            batteryOutlineBitmapCoordinate.Y, 
+            batteryOutlineBitmap
+        );
+        if (Properties.getValue("ShowEnvironment") as Boolean){
+            dc.drawBitmap(
+                pressureBitmapCoordinate.X, 
+                pressureBitmapCoordinate.Y, 
+                pressureBitmap
+            );
+            dc.drawBitmap(
+                altitudeBitmapCoordinate.X, 
+                altitudeBitmapCoordinate.Y, 
+                altitudeBitmap
+            );
+            dc.drawBitmap(
+                downBitmapCoordinate.X, 
+                downBitmapCoordinate.Y, 
+                downBitmap
+            );
+            dc.drawBitmap(
+                upBitmapCoordinate.X, 
+                upBitmapCoordinate.Y, 
+                upBitmap
+            );
+            dc.drawBitmap(
+                temperatureBitmapCoordinate.X, 
+                temperatureBitmapCoordinate.Y, 
+                temperatureBitmap
+            );
+            dc.drawBitmap(
+                humidityBitmapCoordinate.X, 
+                humidityBitmapCoordinate.Y, 
+                humidityBitmap
+            );
+        }
+    }
 
     // Load your resources here
     function onLayout(dc as Dc) as Void {
         System.println("onLayout");
         setLayout(Rez.Layouts.WatchFace(dc));
+    }
+
+    function onPartialUpdate(dc){
+        // todo
+        System.println("onPartialUpdate");
+    }
+
+    function onPowerBudgetExceeded(powerInfo) {
+        System.println("onPowerBudgetExceeded");
+        System.println(powerInfo);
     }
 
     // Called when this View is brought to the foreground. Restore
@@ -218,8 +323,16 @@ class SnoutView extends WatchUi.WatchFace {
         // Call the parent onUpdate function to redraw the layout (just the background)
         View.onUpdate(dc);
 
-        dc.drawBitmap(heartRateBitmapCoordinate.X, heartRateBitmapCoordinate.Y, heartRateBitmap);
-        dc.drawBitmap(stepsBitmapCoordinate.X, stepsBitmapCoordinate.Y, stepsBitmap);
+        // Switch the drawing color to be the foreground setting
+        dc.setColor(
+            Properties.getValue("DarkMode") as Boolean 
+                ? 0xFFFFFF 
+                : 0x000000, 
+            Graphics.COLOR_TRANSPARENT
+        );
+
+        drawLines(dc);
+        drawBitmaps(dc);
 
         // activity info
         var activityInfo = Activity.getActivityInfo();
@@ -354,9 +467,9 @@ class SnoutView extends WatchUi.WatchFace {
             currentConditions.temperature != null && 
             currentConditions.relativeHumidity != null
         ){
-            weatherLow = currentConditions.lowTemperature + "°";
-            weatherHigh = currentConditions.highTemperature + "°";
-            temperature = currentConditions.temperature + "°";
+            weatherLow = getFormattedTemp(currentConditions.lowTemperature) + "°";
+            weatherHigh = getFormattedTemp(currentConditions.highTemperature) + "°";
+            temperature = getFormattedTemp(currentConditions.temperature) + "°";
             humidity = currentConditions.relativeHumidity + 
                 (currentConditions.relativeHumidity < 100 ? "%": "");
         }else {
@@ -365,14 +478,22 @@ class SnoutView extends WatchUi.WatchFace {
             temperature = "--";
             humidity = "--";
         }
-        
-        // Switch the drawing color to be the foreground setting
-        dc.setColor(
-            Properties.getValue("DarkMode") as Boolean 
-                ? 0xFFFFFF 
-                : 0x000000, 
-            Graphics.COLOR_TRANSPARENT
-        );
+
+        // Get the current time and format it correctly
+        var timeFormat = "$1$:$2$";
+        var clockTime = System.getClockTime();
+        var hours = clockTime.hour;
+        if (!deviceSettings.is24Hour) {
+            if (hours > 12) {
+                hours = hours - 12;
+            }
+        } else {
+            if (Properties.getValue("UseMilitaryFormat") as Boolean) {
+                timeFormat = "$1$$2$";
+                hours = hours.format("%02d");
+            }
+        }
+        var timeString = Lang.format(timeFormat, [hours, clockTime.min.format("%02d")]);
 
         var moment = Time.now();
         var currentTime = Toybox.Time.Gregorian.info(moment, Time.FORMAT_SHORT);
@@ -390,12 +511,6 @@ class SnoutView extends WatchUi.WatchFace {
             ), 
             Graphics.TEXT_JUSTIFY_LEFT
         );
-        
-        // horizontal divider below date
-        dc.drawLine(16, dateCoordinate.Y + 22, 100, dateCoordinate.Y + 22);
-
-        // vertical divider before dow
-        dc.drawLine(65, dateCoordinate.Y + 22, 65, clockCoordinate.Y+8);
 
         currentTime = Toybox.Time.Gregorian.info(moment, Time.FORMAT_MEDIUM);
         dc.drawText(
@@ -421,24 +536,6 @@ class SnoutView extends WatchUi.WatchFace {
             Graphics.TEXT_JUSTIFY_CENTER
         );
 
-        // horizontal divider before clock
-        dc.drawLine(2, clockCoordinate.Y+8, 102, clockCoordinate.Y+8);
-
-        // Get the current time and format it correctly
-        var timeFormat = "$1$:$2$";
-        var clockTime = System.getClockTime();
-        var hours = clockTime.hour;
-        if (!deviceSettings.is24Hour) {
-            if (hours > 12) {
-                hours = hours - 12;
-            }
-        } else {
-            if (Properties.getValue("UseMilitaryFormat") as Boolean) {
-                timeFormat = "$1$$2$";
-                hours = hours.format("%02d");
-            }
-        }
-        var timeString = Lang.format(timeFormat, [hours, clockTime.min.format("%02d")]);
         dc.drawText(
             clockCoordinate.X, 
             clockCoordinate.Y, 
@@ -469,17 +566,6 @@ class SnoutView extends WatchUi.WatchFace {
             );
         }
 
-        // horizontal divider after clock
-        dc.drawLine(2, clockCoordinate.Y + 52, 174, clockCoordinate.Y + 52);
-
-        // vertical divider before steps
-        dc.drawLine(
-            stepsCoordinate.X - 23, 
-            stepsCoordinate.Y + 3,  
-            stepsCoordinate.X - 23, 
-            stepsCoordinate.Y + 25
-        );
-
         var stepsString = Lang.format("$1$", [steps]);
         dc.drawText(
             stepsCoordinate.X, 
@@ -489,20 +575,12 @@ class SnoutView extends WatchUi.WatchFace {
             Graphics.TEXT_JUSTIFY_LEFT
         );
 
-        // horizontal divider after steps
-        dc.drawLine(
-            2, 
-            stepsCoordinate.Y + 25, 
-            174, 
-            stepsCoordinate.Y + 25
-        );
-
         // solar intensity arc
         if(solarIntensity != 0){
             dc.setPenWidth(
                 solarIntensity > 0
-                    ? 5
-                    : 10
+                    ? 10
+                    : 20
             );
             dc.drawArc(
                 solarIntensityCoordinate.X, 
@@ -547,20 +625,6 @@ class SnoutView extends WatchUi.WatchFace {
             );
         }
 
-        // battery display
-        dc.drawLine(
-            2, batteryOutlineBitmapCoordinate.Y - 3, 
-            174, batteryOutlineBitmapCoordinate.Y - 3
-        );
-        dc.drawLine(
-            16, batteryOutlineBitmapCoordinate.Y + 17, 
-            160, batteryOutlineBitmapCoordinate.Y + 17
-        );
-        dc.drawBitmap(
-            batteryOutlineBitmapCoordinate.X, 
-            batteryOutlineBitmapCoordinate.Y, 
-            batteryOutlineBitmap
-        );
         if(charging){
             dc.setColor(
                 Properties.getValue("DarkMode") as Boolean 
@@ -612,93 +676,63 @@ class SnoutView extends WatchUi.WatchFace {
             Graphics.TEXT_JUSTIFY_LEFT
         );
 
-        dc.drawBitmap(
-            pressureBitmapCoordinate.X, 
-            pressureBitmapCoordinate.Y, 
-            pressureBitmap
-        );
-        dc.drawText(
-            pressureCoordinate.X, 
-            pressureCoordinate.Y, 
-            Graphics.FONT_XTINY, 
-            pressure, 
-            Graphics.TEXT_JUSTIFY_LEFT
-        );
 
-        dc.drawLine(88, 114, 88, 133);
+        // environment
+        if(Properties.getValue("ShowEnvironment") as Boolean){
+            dc.drawText(
+                pressureCoordinate.X, 
+                pressureCoordinate.Y, 
+                Graphics.FONT_XTINY, 
+                pressure, 
+                Graphics.TEXT_JUSTIFY_LEFT
+            );
 
-        dc.drawBitmap(
-            altitudeBitmapCoordinate.X, 
-            altitudeBitmapCoordinate.Y, 
-            altitudeBitmap
-        );
-        dc.drawText(
-            altitudeCoordinate.X, 
-            altitudeCoordinate.Y, 
-            Graphics.FONT_XTINY, 
-            altitude, 
-            Graphics.TEXT_JUSTIFY_LEFT
-        );
+            dc.drawText(
+                altitudeCoordinate.X, 
+                altitudeCoordinate.Y, 
+                Graphics.FONT_XTINY, 
+                altitude, 
+                Graphics.TEXT_JUSTIFY_LEFT
+            );
 
-        dc.drawBitmap(
-            downBitmapCoordinate.X, 
-            downBitmapCoordinate.Y, 
-            downBitmap
-        );
-        dc.drawText(
-            weatherLowCoordinate.X, 
-            weatherLowCoordinate.Y, 
-            Graphics.FONT_XTINY, 
-            weatherLow, 
-            Graphics.TEXT_JUSTIFY_LEFT
-        );
+            dc.drawText(
+                weatherLowCoordinate.X, 
+                weatherLowCoordinate.Y, 
+                Graphics.FONT_XTINY, 
+                weatherLow, 
+                Graphics.TEXT_JUSTIFY_LEFT
+            );
 
-        dc.drawBitmap(
-            conditionBitmapCoordinate.X, 
-            conditionBitmapCoordinate.Y, 
-            conditionBitmap
-        );
+            dc.drawBitmap(
+                    conditionBitmapCoordinate.X, 
+                    conditionBitmapCoordinate.Y, 
+                    conditionBitmap
+            );
 
-        dc.drawBitmap(
-            upBitmapCoordinate.X, 
-            upBitmapCoordinate.Y, 
-            upBitmap
-        );
-        dc.drawText(
-            weatherHighCoordinate.X, 
-            weatherHighCoordinate.Y, 
-            Graphics.FONT_XTINY, 
-            weatherHigh, 
-            Graphics.TEXT_JUSTIFY_RIGHT
-        );
+            dc.drawText(
+                weatherHighCoordinate.X, 
+                weatherHighCoordinate.Y, 
+                Graphics.FONT_XTINY, 
+                weatherHigh, 
+                Graphics.TEXT_JUSTIFY_RIGHT
+            );
 
-        dc.drawBitmap(
-            temperatureBitmapCoordinate.X, 
-            temperatureBitmapCoordinate.Y, 
-            temperatureBitmap
-        );
+            dc.drawText(
+                temperatureCoordinate.X, 
+                temperatureCoordinate.Y, 
+                Graphics.FONT_XTINY, 
+                temperature, 
+                Graphics.TEXT_JUSTIFY_LEFT
+            );
 
-        dc.drawText(
-            temperatureCoordinate.X, 
-            temperatureCoordinate.Y, 
-            Graphics.FONT_XTINY, 
-            temperature, 
-            Graphics.TEXT_JUSTIFY_LEFT
-        );
-
-        dc.drawBitmap(
-            humidityBitmapCoordinate.X, 
-            humidityBitmapCoordinate.Y, 
-            humidityBitmap
-        );
-
-        dc.drawText(
-            humidityCoordinate.X, 
-            humidityCoordinate.Y, 
-            Graphics.FONT_XTINY, 
-            humidity, 
-            Graphics.TEXT_JUSTIFY_LEFT
-        );
+            dc.drawText(
+                humidityCoordinate.X, 
+                humidityCoordinate.Y, 
+                Graphics.FONT_XTINY, 
+                humidity, 
+                Graphics.TEXT_JUSTIFY_LEFT
+            );
+        }
     }
 
     // Called when this View is removed from the screen. Save the

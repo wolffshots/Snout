@@ -3,5 +3,8 @@
     <property id="DarkMode" type="boolean">true</property>
     <property id="UseMilitaryFormat" type="boolean">false</property>
     <property id="ShowSeconds" type="boolean">true</property>
+    <property id="UseFarenheit" type="boolean">false</property>
+    <property id="ShowLines" type="boolean">true</property>
+    <property id="ShowEnvironment" type="boolean">true</property>
 
 </properties>

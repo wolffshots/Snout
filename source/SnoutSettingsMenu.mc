@@ -42,6 +42,39 @@ class SnoutSettingsMenu extends WatchUi.Menu2 {
                 null
             )
         );
+
+        var useFarenheit = Properties.getValue("UseFarenheit") as Boolean;
+        Menu2.addItem(
+            new WatchUi.ToggleMenuItem(
+                Rez.Strings.UseFarenheitTitle, 
+                Rez.Strings.UseFarenheitSubtitle, 
+                "UseFarenheit", 
+                useFarenheit, 
+                null
+            )
+        );
+
+        var showLines = Properties.getValue("ShowLines") as Boolean;
+        Menu2.addItem(
+            new WatchUi.ToggleMenuItem(
+                Rez.Strings.ShowLinesTitle, 
+                Rez.Strings.ShowLinesSubtitle, 
+                "ShowLines", 
+                showLines, 
+                null
+            )
+        );
+
+        var showEnvironment = Properties.getValue("ShowEnvironment") as Boolean;
+        Menu2.addItem(
+            new WatchUi.ToggleMenuItem(
+                Rez.Strings.ShowEnvironmentTitle, 
+                Rez.Strings.ShowEnvironmentSubtitle, 
+                "ShowEnvironment", 
+                showEnvironment, 
+                null
+            )
+        );
     }    
 }
 

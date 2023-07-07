@@ -11,4 +11,12 @@
     <string id="SecondsDisplayTitle">Show Seconds</string>
     <string id="SecondsDisplaySubtitle">Update the seconds display</string>
 
+    <string id="UseFarenheitTitle">Use Farenheit</string>
+    <string id="UseFarenheitSubtitle">On for °F and off for °C</string>
+
+    <string id="ShowLinesTitle">Show lines</string>
+    <string id="ShowLinesSubtitle">Lines between data points</string>
+
+    <string id="ShowEnvironmentTitle">Show environment</string>
+    <string id="ShowEnvironmentSubtitle">Environment data</string>
 </strings>
